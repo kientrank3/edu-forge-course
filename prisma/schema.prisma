@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum LessonType {
+  VIDEO
+  BLOG
+  MIXED 
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  courses     Course[]
+}
+
+model Course {
+  id              String     @id @default(uuid())
+  title           String
+  description     String?
+  categoryId      String
+  isPublished     Boolean    @default(false)
+  category        Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  level           CourseLevel?
+  ownerId         String     // Đổi từ userId thành ownerId
+  price           Float      @default(0.00)
+  currency        String     @default("VND")
+  thumbnailUrl    String?
+  tags            String[]   // Thêm trường tags
+  chapters        Chapter[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Chapter {
+  id              String     @id @default(uuid())
+  title           String
+  description     String?
+  order           Int        @default(0)
+  courseId        String
+  isPublished     Boolean    @default(false)
+  course          Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons         Lesson[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Lesson {
+  id              String     @id @default(uuid())
+  title           String
+  content         String?    // Nội dung blog
+  type            LessonType @default(MIXED) // Loại bài học (VIDEO, BLOG, hoặc MIXED)
+  videoUrl        String?    // Đường dẫn video (nếu có)
+  order           Int        @default(0)
+  chapterId       String
+  isPublished     Boolean    @default(false)
+  isFreePreview   Boolean    @default(false) // Cho phép xem miễn phí bài học này
+  chapter         Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
