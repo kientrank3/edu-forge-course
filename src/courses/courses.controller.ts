@@ -66,6 +66,11 @@ export class CoursesController {
     return this.courseService.updateCourse(id, data);
   }
 
+  @Get(':id/structure')
+  async getCourseStructure(@Param('id') id: string) {
+    return await this.courseService.getCourseStructure(id);
+  }
+
   // API: Xóa khóa học
   @Delete(':id')
   async deleteCourse(@Param('id', ParseIntPipe) id: string) {

@@ -19,14 +19,13 @@ export class LessonsService {
         courseId: courseId,
       },
     });
-
     if (!chapter) {
       throw new NotFoundException(
         'Chapter not found or does not belong to the specified course',
       );
     }
-
-    return this.prisma.lesson.create({
+    // Tạo bài học mới
+    const lesson = await this.prisma.lesson.create({
       data: {
         title: createLessonDto.title,
         content: createLessonDto.content,
@@ -34,13 +33,22 @@ export class LessonsService {
         videoUrl: createLessonDto.videoUrl,
         order: createLessonDto.order ?? 0,
         isPublished: createLessonDto.isPublished ?? false,
-        isFreePreview: createLessonDto.isFreePreview ?? false,
         chapterId,
       },
       include: {
         chapter: true,
       },
     });
+    // Cập nhật totalLessons của khóa học
+    await this.prisma.course.update({
+      where: { id: courseId },
+      data: {
+        totalLessons: {
+          increment: 1,
+        },
+      },
+    });
+    return lesson;
   }
 
   async findAllByChapterId(chapterId: string) {

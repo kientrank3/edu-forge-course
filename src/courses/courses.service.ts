@@ -24,7 +24,27 @@ export class CoursesService {
       },
     });
   }
-
+  async getCourseStructure(courseId: string) {
+    return this.prisma.course.findUnique({
+      where: { id: courseId },
+      select: {
+        id: true,
+        title: true,
+        chapters: {
+          select: {
+            id: true,
+            title: true,
+            lessons: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
   // Lấy danh sách khóa học với bộ lọc & phân trang
   async findAll(
     filters: {
