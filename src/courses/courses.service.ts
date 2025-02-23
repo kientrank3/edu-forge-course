@@ -24,11 +24,33 @@ export class CoursesService {
       },
     });
   }
-  async getCourseStructure(courseId: string) {
+  async getCourseStructureById(courseId: string) {
     return this.prisma.course.findUnique({
       where: { id: courseId },
       select: {
         id: true,
+        title: true,
+        chapters: {
+          select: {
+            id: true,
+            title: true,
+            lessons: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+  async getCourseStructureByUserId(ownerId: string) {
+    return this.prisma.course.findMany({
+      where: { ownerId: ownerId },
+      select: {
+        id: true,
+        ownerId: true,
         title: true,
         chapters: {
           select: {

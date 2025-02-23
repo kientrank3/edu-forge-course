@@ -67,8 +67,12 @@ export class CoursesController {
   }
 
   @Get(':id/structure')
-  async getCourseStructure(@Param('id') id: string) {
-    return await this.courseService.getCourseStructure(id);
+  async getCourseStructureById(@Param('id') id: string) {
+    return await this.courseService.getCourseStructureById(id);
+  }
+  @Get(':userid/structure')
+  async getCourseStructureByUserId(@Param('userid') id: string) {
+    return await this.courseService.getCourseStructureByUserId(id);
   }
 
   // API: Xóa khóa học
