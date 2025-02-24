@@ -7,6 +7,7 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 export class LessonsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // src/lessons/lessons.service.ts
   async create(
     courseId: string,
     chapterId: string,
@@ -24,14 +25,24 @@ export class LessonsService {
         'Chapter not found or does not belong to the specified course',
       );
     }
-    // Tạo bài học mới
+
+    // Lấy lesson cuối cùng trong chapter để xác định giá trị order
+    const lastLesson = await this.prisma.lesson.findFirst({
+      where: { chapterId },
+      orderBy: { order: 'desc' }, // Sắp xếp theo order giảm dần để lấy lesson cuối cùng
+    });
+
+    // Nếu không có lesson nào, order mặc định là 1, ngược lại tăng order lên 1
+    const newOrder = lastLesson ? lastLesson.order + 1 : 1;
+
+    // Tạo lesson mới
     const lesson = await this.prisma.lesson.create({
       data: {
         title: createLessonDto.title,
         content: createLessonDto.content,
         type: createLessonDto.type,
         videoUrl: createLessonDto.videoUrl,
-        order: createLessonDto.order ?? 0,
+        order: createLessonDto.order ?? newOrder, // Sử dụng order từ DTO nếu có, ngược lại dùng newOrder
         isPublished: createLessonDto.isPublished ?? false,
         chapterId,
       },
@@ -39,6 +50,7 @@ export class LessonsService {
         chapter: true,
       },
     });
+
     // Cập nhật totalLessons của khóa học
     await this.prisma.course.update({
       where: { id: courseId },
@@ -48,6 +60,7 @@ export class LessonsService {
         },
       },
     });
+
     return lesson;
   }
 
@@ -89,14 +102,8 @@ export class LessonsService {
     return lesson;
   }
 
-  async update(
-    courseId: string,
-    chapterId: string,
-    id: string,
-    updateLessonDto: UpdateLessonDto,
-  ) {
-    await this.findOne(courseId, chapterId, id);
-
+  async update(id: string, updateLessonDto: UpdateLessonDto) {
+    await this.findOneById(id); // Kiểm tra lesson tồn tại
     return this.prisma.lesson.update({
       where: { id },
       data: {
@@ -105,10 +112,23 @@ export class LessonsService {
       },
     });
   }
+  async findOneById(id: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id },
+      include: {
+        chapter: true,
+      },
+    });
 
-  async remove(courseId: string, chapterId: string, id: string) {
-    await this.findOne(courseId, chapterId, id); // Kiểm tra bài học tồn tại
+    if (!lesson) {
+      throw new NotFoundException('Lesson not found');
+    }
 
+    return lesson;
+  }
+
+  async remove(id: string) {
+    await this.findOneById(id);
     return this.prisma.lesson.delete({
       where: { id },
     });

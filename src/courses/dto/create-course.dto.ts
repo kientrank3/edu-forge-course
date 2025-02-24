@@ -20,7 +20,8 @@ export class CreateCourseDto {
   @IsOptional()
   @IsEnum(CourseLevel)
   level?: CourseLevel;
-
+  @IsString()
+  ownerId: string;
   @IsNumber()
   price: number;
 

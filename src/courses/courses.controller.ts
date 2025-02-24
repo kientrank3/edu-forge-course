@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Query,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
@@ -59,10 +58,7 @@ export class CoursesController {
 
   // API: Cập nhật khóa học
   @Patch(':id')
-  async updateCourse(
-    @Param('id', ParseIntPipe) id: string,
-    @Body() data: UpdateCourseDto,
-  ) {
+  async updateCourse(@Param('id') id: string, @Body() data: UpdateCourseDto) {
     return this.courseService.updateCourse(id, data);
   }
 
@@ -70,14 +66,14 @@ export class CoursesController {
   async getCourseStructureById(@Param('id') id: string) {
     return await this.courseService.getCourseStructureById(id);
   }
-  @Get(':userid/structure')
+  @Get('user/:userid/structure')
   async getCourseStructureByUserId(@Param('userid') id: string) {
     return await this.courseService.getCourseStructureByUserId(id);
   }
 
   // API: Xóa khóa học
   @Delete(':id')
-  async deleteCourse(@Param('id', ParseIntPipe) id: string) {
+  async deleteCourse(@Param('id') id: string) {
     return this.courseService.deleteCourse(id);
   }
   @Patch(':id/publish')

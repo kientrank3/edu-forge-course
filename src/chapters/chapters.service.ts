@@ -11,17 +11,21 @@ export class ChaptersService {
     const course = await this.prisma.course.findUnique({
       where: { id: createChapterDto.courseId },
     });
-
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-
+    const lastChapter = await this.prisma.chapter.findFirst({
+      where: { courseId: createChapterDto.courseId },
+      orderBy: { order: 'desc' }, // Sắp xếp theo order giảm dần để lấy chapter cuối cùng
+    });
+    const newOrder = lastChapter ? lastChapter.order + 1 : 1;
+    // Tạo chapter mới
     return this.prisma.chapter.create({
       data: {
         title: createChapterDto.title,
         description: createChapterDto.description,
         courseId: createChapterDto.courseId,
-        order: createChapterDto.order ?? 0,
+        order: createChapterDto.order ?? newOrder, // Sử dụng order từ DTO nếu có, ngược lại dùng newOrder
         isPublished: createChapterDto.isPublished ?? false,
       },
       include: {

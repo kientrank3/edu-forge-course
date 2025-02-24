@@ -12,11 +12,11 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 import { LessonsService } from './lessons.service';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 
-@Controller('courses/:courseId/chapters/:chapterId/lessons')
+@Controller('lessons')
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
-  @Post()
+  @Post('courses/:courseId/chapters/:chapterId')
   create(
     @Param('courseId') courseId: string,
     @Param('chapterId') chapterId: string,
@@ -25,41 +25,28 @@ export class LessonsController {
     return this.lessonsService.create(courseId, chapterId, createLessonDto);
   }
 
-  @Get()
+  @Get('chapters/:chapterId')
   findAllByChapterId(@Param('chapterId') chapterId: string) {
     return this.lessonsService.findAllByChapterId(chapterId);
   }
 
-  @Get('all')
+  @Get('courses/:courseId')
   findAllByCourseId(@Param('courseId') courseId: string) {
     return this.lessonsService.findAllByCourseId(courseId);
   }
 
   @Get(':id')
-  findOne(
-    @Param('courseId') courseId: string,
-    @Param('chapterId') chapterId: string,
-    @Param('id') id: string,
-  ) {
-    return this.lessonsService.findOne(courseId, chapterId, id);
+  findOne(@Param('id') id: string) {
+    return this.lessonsService.findOneById(id);
   }
 
   @Put(':id')
-  update(
-    @Param('courseId') courseId: string,
-    @Param('chapterId') chapterId: string,
-    @Param('id') id: string,
-    @Body() updateLessonDto: UpdateLessonDto,
-  ) {
-    return this.lessonsService.update(courseId, chapterId, id, updateLessonDto);
+  update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
+    return this.lessonsService.update(id, updateLessonDto);
   }
 
   @Delete(':id')
-  remove(
-    @Param('courseId') courseId: string,
-    @Param('chapterId') chapterId: string,
-    @Param('id') id: string,
-  ) {
-    return this.lessonsService.remove(courseId, chapterId, id);
+  remove(@Param('id') id: string) {
+    return this.lessonsService.remove(id);
   }
 }

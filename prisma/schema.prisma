@@ -57,7 +57,7 @@ model Chapter {
   lessons         Lesson[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
-  
+  @@unique([order])
 }
 
 model Lesson {
@@ -73,6 +73,7 @@ model Lesson {
   chapter         Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+   @@unique([order])
   userProgress    UserProgress[]
 }
 model UserProgress {
