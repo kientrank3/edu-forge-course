@@ -23,7 +23,6 @@ export class CreateLessonDto {
   @IsInt()
   duration?: number;
   isPublished?: boolean;
-  @IsInt()
-  order: number;
+  order?: number;
   isFreePreview?: boolean;
 }

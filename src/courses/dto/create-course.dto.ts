@@ -28,7 +28,7 @@ export class CreateCourseDto {
   @IsOptional()
   @IsString()
   currency?: string;
-
+  isHasCertificate?: boolean;
   isPublished?: boolean;
   @IsOptional()
   @IsUrl()
