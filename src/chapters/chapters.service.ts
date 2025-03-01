@@ -37,13 +37,6 @@ export class ChaptersService {
   async findByCourse(courseId: string) {
     const chapters = await this.prisma.chapter.findMany({
       where: { courseId },
-      include: {
-        lessons: {
-          orderBy: {
-            order: 'asc',
-          },
-        },
-      },
       orderBy: {
         order: 'asc',
       },

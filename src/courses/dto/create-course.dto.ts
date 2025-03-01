@@ -24,7 +24,7 @@ export class CreateCourseDto {
   ownerId: string;
   @IsNumber()
   price: number;
-
+  promotionPrice?: number;
   @IsOptional()
   @IsString()
   currency?: string;

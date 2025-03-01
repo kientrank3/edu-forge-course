@@ -97,6 +97,25 @@ export class CoursesService {
       take: limit,
       include: {
         category: true,
+      },
+    });
+  }
+  async findByCategoryId(categoryId: string) {
+    return this.prisma.course.findMany({
+      where: { categoryId },
+      include: {
+        category: true,
+      },
+    });
+  }
+  async findAllStructure(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    return this.prisma.course.findMany({
+      skip,
+      take: limit,
+      include: {
+        category: true,
         chapters: {
           include: {
             lessons: true,

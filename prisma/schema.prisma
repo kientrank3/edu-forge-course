@@ -39,11 +39,15 @@ model Course {
   currency        String     @default("VND")
   thumbnailUrl    String?
   tags            String[]   
+  promotionPrice  Float?
   isHasCertificate Boolean    @default(false)
   chapters        Chapter[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   totalLessons   Int        @default(0)
+  learningOutcomes String[]  
+  requirements     String[]  
+  targetAudience   String?   
 }
 
 model Chapter {

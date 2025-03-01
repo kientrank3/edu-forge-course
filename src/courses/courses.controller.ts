@@ -31,8 +31,6 @@ export class CoursesController {
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('level') level?: string,
-    @Query('minDuration') minDuration?: string,
-    @Query('maxDuration') maxDuration?: string,
     @Query('createdAt') createdAt?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -48,6 +46,14 @@ export class CoursesController {
       page ? +page : 1,
       limit ? +limit : 10,
     );
+  }
+  @Get('category/:categoryId')
+  findByCategoryId(@Param('categoryId') categoryId: string) {
+    return this.courseService.findByCategoryId(categoryId);
+  }
+  @Get('/all')
+  async findAllCourses() {
+    return this.courseService.findAllStructure();
   }
 
   // API: Lấy chi tiết một khóa học theo ID
