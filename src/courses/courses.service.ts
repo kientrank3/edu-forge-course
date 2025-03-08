@@ -133,7 +133,9 @@ export class CoursesService {
         category: true,
         chapters: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
         },
       },
