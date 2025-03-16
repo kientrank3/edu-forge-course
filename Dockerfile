@@ -1,5 +1,5 @@
 # Builder stage
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS build-stage
 
 WORKDIR /app
 
@@ -18,18 +18,23 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine AS production
 
+# Cài đặt các gói cần thiết để sử dụng pg_isready
+RUN apk add --no-cache postgresql-client
+
 WORKDIR /app
 
 # Copy package files and install only production dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install --only=production
+
+# Copy Prisma schema and generate client
 COPY prisma ./prisma/
 RUN npx prisma generate
 
 # Copy built application and Prisma client from builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-RUN npx prisma migrate deploy
+COPY --from=build-stage /app/dist ./dist
+COPY --from=build-stage /app/node_modules/.prisma ./node_modules/.prisma
+
 # Expose port and define runtime command
 EXPOSE 3002
 CMD ["node", "dist/src/main.js"]
