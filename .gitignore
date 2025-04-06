@@ -48,6 +48,9 @@ lerna-debug.log*
 
 # Runtime data
 pids
+
+# Database
+/data/postgres
 *.pid
 *.seed
 *.pid.lock
