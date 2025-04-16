@@ -35,6 +35,11 @@ export class LessonsService {
     // Nếu không có lesson nào, order mặc định là 1, ngược lại tăng order lên 1
     const newOrder = lastLesson ? lastLesson.order + 1 : 1;
 
+    // Kiểm tra title có tồn tại không
+    if (!createLessonDto || !createLessonDto.title) {
+      throw new Error('Lesson title is required');
+    }
+
     // Tạo lesson mới
     const lesson = await this.prisma.lesson.create({
       data: {
@@ -44,6 +49,7 @@ export class LessonsService {
         videoUrl: createLessonDto.videoUrl,
         order: createLessonDto.order ?? newOrder, // Sử dụng order từ DTO nếu có, ngược lại dùng newOrder
         isPublished: createLessonDto.isPublished ?? false,
+        isFreePreview: createLessonDto.isFreePreview ?? false,
         chapterId,
       },
       include: {

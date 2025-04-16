@@ -7,15 +7,25 @@ import { UpdateChapterDto } from './dto/update-chapter.dto';
 export class ChaptersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createChapterDto: CreateChapterDto) {
+  async create(courseId: string, createChapterDto: CreateChapterDto) {
+    // Kiểm tra title có tồn tại không
+    if (!createChapterDto || !createChapterDto.title) {
+      throw new Error('Chapter title is required');
+    }
+
+    // Kiểm tra courseId có tồn tại không
+    if (!courseId) {
+      throw new Error('Course ID is required');
+    }
+
     const course = await this.prisma.course.findUnique({
-      where: { id: createChapterDto.courseId },
+      where: { id: courseId },
     });
     if (!course) {
       throw new NotFoundException('Course not found');
     }
     const lastChapter = await this.prisma.chapter.findFirst({
-      where: { courseId: createChapterDto.courseId },
+      where: { courseId },
       orderBy: { order: 'desc' }, // Sắp xếp theo order giảm dần để lấy chapter cuối cùng
     });
     const newOrder = lastChapter ? lastChapter.order + 1 : 1;
@@ -24,7 +34,7 @@ export class ChaptersService {
       data: {
         title: createChapterDto.title,
         description: createChapterDto.description,
-        courseId: createChapterDto.courseId,
+        courseId,
         order: createChapterDto.order ?? newOrder, // Sử dụng order từ DTO nếu có, ngược lại dùng newOrder
         isPublished: createChapterDto.isPublished ?? false,
       },

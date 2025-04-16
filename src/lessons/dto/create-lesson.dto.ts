@@ -5,6 +5,9 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsEnum,
+  IsBoolean,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateLessonDto {
@@ -14,15 +17,27 @@ export class CreateLessonDto {
   @IsOptional()
   @IsString()
   content?: string;
+  @IsOptional()
+  @IsEnum(LessonType)
   type?: LessonType;
   @IsOptional()
   @IsUrl()
   videoUrl?: string;
-  chapterId: number;
+  @IsOptional()
+  @IsString()
+  chapterId?: string;
   @IsOptional()
   @IsInt()
   duration?: number;
+  @IsOptional()
+  @IsBoolean()
   isPublished?: boolean;
+
+  @IsOptional()
+  @IsNumber()
   order?: number;
+
+  @IsOptional()
+  @IsBoolean()
   isFreePreview?: boolean;
 }

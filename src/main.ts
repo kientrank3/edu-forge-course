@@ -10,8 +10,15 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  // Set up validation pipe before listening
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, // Remove non-whitelisted properties
+    transform: true, // Transform payloads to DTO instances
+    forbidNonWhitelisted: true, // Throw errors if non-whitelisted values are provided
+  }));
+
   await app.listen(3002);
-  app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle('Edu Force')
     .setDescription(

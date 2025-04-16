@@ -9,6 +9,21 @@ export class CoursesService {
 
   // Tạo khóa học mới
   async createCourse(data: CreateCourseDto & { ownerId: string }) {
+    // Kiểm tra title có tồn tại không
+    if (!data || !data.title) {
+      throw new Error('Course title is required');
+    }
+
+    // Kiểm tra categoryId có tồn tại không
+    if (!data.categoryId) {
+      throw new Error('Category ID is required');
+    }
+
+    // Kiểm tra ownerId có tồn tại không
+    if (!data.ownerId) {
+      throw new Error('Owner ID is required');
+    }
+
     return this.prisma.course.create({
       data: {
         title: data.title,
@@ -21,6 +36,10 @@ export class CoursesService {
         level: data.level as CourseLevel,
         tags: data.tags || [],
         thumbnailUrl: data.thumbnailUrl,
+        learningOutcomes: data.learningOutcomes || [],
+        requirements: data.requirements || [],
+        targetAudience: data.targetAudience,
+        isHasCertificate: data.isHasCertificate || false,
       },
     });
   }

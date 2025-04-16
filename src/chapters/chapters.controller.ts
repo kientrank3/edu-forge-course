@@ -20,10 +20,7 @@ export class ChaptersController {
     @Param('courseId') courseId: string,
     @Body() createChapterDto: CreateChapterDto,
   ) {
-    return this.chaptersService.create({
-      ...createChapterDto,
-      courseId: courseId,
-    });
+    return this.chaptersService.create(courseId, createChapterDto);
   }
 
   @Get('courses/:courseId/chapters')
