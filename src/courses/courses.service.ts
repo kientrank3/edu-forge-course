@@ -127,10 +127,51 @@ export class CoursesService {
       },
     });
   }
-  async findAllStructure(page: number = 1, limit: number = 10) {
+  async findAllStructure(
+    filters: {
+      categoryId?: string;
+      isPublished?: boolean;
+      search?: string;
+    } = {},
+    page: number = 1,
+    limit: number = 10,
+  ) {
     const skip = (page - 1) * limit;
 
-    return this.prisma.course.findMany({
+    // Build where conditions based on filters
+    const where: {
+      categoryId?: string;
+      isPublished?: boolean;
+      OR?: Array<
+        | { title: { contains: string; mode: 'insensitive' } }
+        | { description: { contains: string; mode: 'insensitive' } }
+      >;
+    } = {};
+
+    if (filters.categoryId) {
+      where.categoryId = filters.categoryId;
+    }
+
+    if (filters.isPublished !== undefined) {
+      where.isPublished = filters.isPublished;
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Get total count of courses with filters applied
+    const totalCount = await this.prisma.course.count({ where });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // Get paginated courses with their relations
+    const courses = await this.prisma.course.findMany({
+      where,
       skip,
       take: limit,
       include: {
@@ -141,7 +182,23 @@ export class CoursesService {
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc', // Sort by newest first
+      },
     });
+
+    // Return pagination metadata along with the courses
+    return {
+      data: courses,
+      meta: {
+        totalCount,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 
   // Lấy chi tiết khóa học theo ID

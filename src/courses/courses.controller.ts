@@ -52,8 +52,27 @@ export class CoursesController {
     return this.courseService.findByCategoryId(categoryId);
   }
   @Get('/all')
-  async findAllCourses() {
-    return this.courseService.findAllStructure();
+  async findAllCourses(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('isPublished') isPublished?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.courseService.findAllStructure(
+      {
+        categoryId,
+        isPublished:
+          isPublished === 'true'
+            ? true
+            : isPublished === 'false'
+              ? false
+              : undefined,
+        search,
+      },
+      page ? +page : 1,
+      limit ? +limit : 10,
+    );
   }
 
   // API: Lấy chi tiết một khóa học theo ID

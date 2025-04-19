@@ -6,17 +6,20 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: ['*'], // Thêm tất cả domains cần thiết
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'], // Thêm OPTIONS và để dạng array
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id'], // Cần định nghĩa rõ allowed headers
     credentials: true,
   });
 
   // Set up validation pipe before listening
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // Remove non-whitelisted properties
-    transform: true, // Transform payloads to DTO instances
-    forbidNonWhitelisted: true, // Throw errors if non-whitelisted values are provided
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Remove non-whitelisted properties
+      transform: true, // Transform payloads to DTO instances
+      forbidNonWhitelisted: true, // Throw errors if non-whitelisted values are provided
+    }),
+  );
 
   await app.listen(3002);
   const config = new DocumentBuilder()
