@@ -7,6 +7,8 @@ import {
   Param,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -23,7 +25,11 @@ export class CategoriesController {
 
   @Get()
   findAll() {
-    return this.categoriesService.findAll();
+    console.log('Categories service is currently unavailable');
+    throw new HttpException(
+      'Categories service is currently unavailable',
+      HttpStatus.SERVICE_UNAVAILABLE,
+    );
   }
 
   @Get(':id')
