@@ -32,6 +32,7 @@ export class CoursesController {
     @Query('maxPrice') maxPrice?: string,
     @Query('level') level?: string,
     @Query('createdAt') createdAt?: string,
+    @Query('search') search?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
@@ -42,6 +43,7 @@ export class CoursesController {
         maxPrice: maxPrice ? +maxPrice : undefined,
         level: level ? (level as CourseLevel) : undefined,
         createdAt: createdAt ? new Date(createdAt) : undefined,
+        search,
       },
       page ? +page : 1,
       limit ? +limit : 10,

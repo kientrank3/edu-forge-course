@@ -95,29 +95,91 @@ export class CoursesService {
       level?: CourseLevel;
       createdAt?: Date;
       tags?: string[];
+      search?: string;
     },
     page: number = 1,
     limit: number = 10,
   ) {
     const skip = (page - 1) * limit;
 
-    return this.prisma.course.findMany({
-      where: {
-        categoryId: filters.categoryId,
-        price: {
-          gte: filters.minPrice,
-          lte: filters.maxPrice,
-        },
-        level: filters.level,
-        createdAt: filters.createdAt,
-        tags: filters.tags ? { hasSome: filters.tags } : undefined, // Lọc theo tags
-      },
+    // Build where conditions based on filters
+    const where: {
+      categoryId?: string;
+      price?: { gte?: number; lte?: number };
+      level?: CourseLevel;
+      createdAt?: Date;
+      tags?: { hasSome: string[] };
+      isPublished?: boolean;
+      OR?: Array<
+        | { title: { contains: string; mode: 'insensitive' } }
+        | { description: { contains: string; mode: 'insensitive' } }
+      >;
+    } = {};
+
+    if (filters.categoryId) {
+      where.categoryId = filters.categoryId;
+    }
+
+    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+      where.price = {};
+      if (filters.minPrice !== undefined) {
+        where.price.gte = filters.minPrice;
+      }
+      if (filters.maxPrice !== undefined) {
+        where.price.lte = filters.maxPrice;
+      }
+    }
+
+    if (filters.level) {
+      where.level = filters.level;
+    }
+
+    if (filters.createdAt) {
+      where.createdAt = filters.createdAt;
+    }
+
+    if (filters.tags && filters.tags.length > 0) {
+      where.tags = { hasSome: filters.tags };
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Get total count of courses with filters applied
+    const totalCount = await this.prisma.course.count({ where });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // Get paginated courses with their relations
+    const courses = await this.prisma.course.findMany({
+      where,
       skip,
       take: limit,
       include: {
         category: true,
       },
+      orderBy: {
+        createdAt: 'desc', // Sort by newest first
+      },
     });
+
+    // Return pagination metadata along with the courses
+    return {
+      data: courses,
+      meta: {
+        totalCount,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
   async findByCategoryId(categoryId: string) {
     return this.prisma.course.findMany({
