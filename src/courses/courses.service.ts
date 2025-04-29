@@ -167,7 +167,6 @@ export class CoursesService {
         createdAt: 'desc', // Sort by newest first
       },
     });
-
     // Return pagination metadata along with the courses
     return {
       data: courses,
@@ -309,5 +308,20 @@ export class CoursesService {
       where: { id },
       data: { isPublished: false },
     });
+  }
+
+  // Lấy thống kê khóa học
+  async getStats() {
+    // Tổng số khóa học
+    const totalCourses = await this.prisma.course.count();
+    console.log(totalCourses);
+    // Số khóa học đang hoạt động (đã publish)
+    const activeCourses = await this.prisma.course.count({
+      where: { isPublished: true },
+    });
+    return {
+      totalCourses,
+      activeCourses,
+    };
   }
 }

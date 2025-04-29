@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Headers,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -21,8 +22,11 @@ export class CoursesController {
 
   // API: Tạo khóa học
   @Post()
-  async createCourse(@Body() data: CreateCourseDto & { ownerId: string }) {
-    return this.courseService.createCourse(data);
+  async createCourse(
+    @Body() data: CreateCourseDto,
+    @Headers('X-User-Id') requestUserId: string,
+  ) {
+    return this.courseService.createCourse({ ...data, ownerId: requestUserId });
   }
 
   @Get()
@@ -78,6 +82,11 @@ export class CoursesController {
   }
 
   // API: Lấy chi tiết một khóa học theo ID
+  @Get('stats')
+  async getStats() {
+    return this.courseService.getStats();
+  }
+
   @Get(':id')
   async getCourseById(@Param('id') id: string) {
     return this.courseService.findOne(id);
@@ -93,9 +102,11 @@ export class CoursesController {
   async getCourseStructureById(@Param('id') id: string) {
     return await this.courseService.getCourseStructureById(id);
   }
-  @Get('user/:userid/structure')
-  async getCourseStructureByUserId(@Param('userid') id: string) {
-    return await this.courseService.getCourseStructureByUserId(id);
+  @Get('user/structure')
+  async getCourseStructureByUserId(
+    @Headers('X-User-Id') requestUserId: string,
+  ) {
+    return await this.courseService.getCourseStructureByUserId(requestUserId);
   }
 
   // API: Xóa khóa học
