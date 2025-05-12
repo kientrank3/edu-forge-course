@@ -102,10 +102,8 @@ export class CoursesController {
   async getCourseStructureById(@Param('id') id: string) {
     return await this.courseService.getCourseStructureById(id);
   }
-  @Get('user/structure')
-  async getCourseStructureByUserId(
-    @Headers('X-User-Id') requestUserId: string,
-  ) {
+  @Get('user/:userId/structure')
+  async getCourseStructureByUserId(@Param('userId') requestUserId: string) {
     return await this.courseService.getCourseStructureByUserId(requestUserId);
   }
 
